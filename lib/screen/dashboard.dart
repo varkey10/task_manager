@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/screen/add_task.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_manager/cubit/task/task_cubit.dart';
+import 'package:task_manager/screen/Task/add_task.dart';
+import 'package:task_manager/screen/Task/task_listing.dart';
 import 'package:task_manager/screen/settings.dart';
 import 'package:task_manager/widgets/dashboard.dart';
 
@@ -74,37 +77,32 @@ class TasksDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final taskCubit = context.read<TaskCubit>();
+    //
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         title: const Text('Tasks'),
-        actions: [
-          Tooltip(
-            message: "Add Task",
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const NewTaskSheet(),
-                    );
-                  }, // ← your custom widget
-                );
-              },
-            ),
-          )
-        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
+        currentIndex: 0,
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Tasks'),
+          BottomNavigationBarItem(
+              icon: IconButton(
+                  onPressed: () async {
+                    await taskCubit.loadTasks();
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TaskListingScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.task)),
+              label: 'Tasks'),
           BottomNavigationBarItem(
             icon: IconButton(
                 onPressed: () {
@@ -114,7 +112,7 @@ class TasksDashboard extends StatelessWidget {
                         builder: (context) => SettingsScreen(),
                       ));
                 },
-                icon: Icon(Icons.settings)),
+                icon: const Icon(Icons.settings)),
             label: 'Profile',
           ),
         ],

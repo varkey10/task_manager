@@ -1,87 +1,84 @@
 import 'package:dio/dio.dart';
-import 'package:task_manager/network/endpoints.dart';
+import 'package:task_manager/network/baseUrl.dart';
 
 class ApiService {
-  final Dio _dio;
-  
-  ApiService({Dio? dio})
-      : _dio = dio ??
-            Dio(
-              BaseOptions(
-                connectTimeout: const Duration(seconds: 10),
-                receiveTimeout: const Duration(seconds: 20),
-                baseUrl: APiendpoints.endPoint,
-              ),
-            );
+  final Dio _dio = Dio();
 
   /// POST request
-  Future<Map<String, dynamic>> postData(
-    String url,
-    Map<String, dynamic> body, {
-    Map<String, String>? headers,
+  Future<Map<String, dynamic>> postData({
+    required String endPoint,
+    Map<String, dynamic>? body,
+    required bool isforcred,
   }) async {
     try {
+      var urls = isforcred ? APiendpoints.baseUrl2 : APiendpoints.baseUrl;
       final response = await _dio.post(
-        url,
+        urls + endPoint,
         data: body,
-        options: Options(headers: headers ?? {"x-api-key": "reqres-free-v1"}),
+        options: Options(headers: {"x-api-key": "reqres-free-v1"}),
       );
       return _processResponse(response);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   /// GET request
   Future<Map<String, dynamic>> getData(
-    String url, {
-    Map<String, dynamic>? query,
-    Map<String, String>? headers,
-  }) async {
+      {required String endPoint,
+      Map<String, dynamic>? query,
+      Map<String, String>? headers,
+      required bool isforcred}) async {
     try {
+      var urls = isforcred ? APiendpoints.baseUrl2 : APiendpoints.baseUrl;
+
       final response = await _dio.get(
-        url,
+        urls + endPoint,
         queryParameters: query,
         options: Options(headers: headers ?? {"x-api-key": "reqres-free-v1"}),
       );
       return _processResponse(response);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   /// PUT request
   Future<Map<String, dynamic>> putData(
-    String url,
-    Map<String, dynamic> body, {
-    Map<String, String>? headers,
-  }) async {
+      {required String endPoint,
+      Map<String, dynamic>? body,
+      Map<String, String>? headers,
+      required bool isforcred}) async {
     try {
+      var urls = isforcred ? APiendpoints.baseUrl2 : APiendpoints.baseUrl;
+
       final response = await _dio.put(
-        url,
+        urls + endPoint,
         data: body,
         options: Options(headers: headers ?? {"x-api-key": "reqres-free-v1"}),
       );
       return _processResponse(response);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   /// DELETE request
   Future<Map<String, dynamic>> deleteData(
-    String url, {
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-  }) async {
+      {required String endPoint,
+      Map<String, dynamic>? body,
+      Map<String, String>? headers,
+      required bool isforcred}) async {
     try {
+      var urls = isforcred ? APiendpoints.baseUrl2 : APiendpoints.baseUrl;
+
       final response = await _dio.delete(
-        url,
+        urls + endPoint,
         data: body,
         options: Options(headers: headers ?? {"x-api-key": "reqres-free-v1"}),
       );
       return _processResponse(response);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
@@ -101,9 +98,9 @@ class ApiService {
   }
 
   Exception _handleDioError(DioError e) {
-    if (e.type == DioErrorType.connectionTimeout) {
+    if (e.type == DioException.connectionTimeout) {
       return Exception('Connection timeout. Please try again.');
-    } else if (e.type == DioErrorType.receiveTimeout) {
+    } else if (e.type == DioException.receiveTimeout) {
       return Exception('Receive timeout. Please try again.');
     } else if (e.response != null) {
       // Server responded but with error status code
@@ -118,3 +115,5 @@ class ApiService {
     }
   }
 }
+
+enum Method { get, post, put, delete, form }

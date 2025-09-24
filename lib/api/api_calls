@@ -1,0 +1,98 @@
+import 'package:task_manager/network/network_service.dart';
+
+class NetworkRepository {
+  final ApiService _obj = ApiService();
+
+  Future<dynamic> userLogin(Map<String, dynamic> param) async {
+    try {
+      final response = await _obj.postData(
+        endPoint: 'login',
+        body: param,
+        isforcred: false,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> userRegisteration(Map<String, dynamic> param) async {
+    try {
+      final response = await _obj.postData(
+        endPoint: 'register',
+        body: param,
+        isforcred: false,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getUsers() async {
+    try {
+      final response = await _obj.getData(
+        endPoint: 'users',
+        isforcred: false,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+//////// credOperation for Task /////////////// 
+
+
+
+  Future<dynamic> taskList() async {
+    try {
+      final response = await _obj.getData(
+        endPoint: 'todos',
+        isforcred: true,
+              );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> addTask(Map<String, dynamic> param) async {
+    try {
+      final response = await _obj.postData(
+        endPoint: 'todos',
+        isforcred: true,
+        body: param,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  
+  Future<dynamic> updateTask(int id) async {
+    try {
+      final response = await _obj.postData(
+        endPoint: 'todos/$id',
+        isforcred: true,
+       
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> deleteTask(int id) async {
+    try {
+      final response = await _obj.deleteData(
+        endPoint: 'todos/$id',
+        isforcred: true,
+             );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+}

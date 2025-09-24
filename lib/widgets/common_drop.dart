@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_manager/cubit/Auth_cubit_cubit.dart';
-import 'package:task_manager/cubit/task_cubit_state.dart';
+import 'package:task_manager/cubit/authentication/Auth_cubit_cubit.dart';
+import 'package:task_manager/cubit/authentication/Auth_cubit_state.dart';
 
-class UsersDropdown extends StatefulWidget {
+class CommonDropforUsers extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onUserSelected;
-  const UsersDropdown({super.key, required this.onUserSelected});
+  const CommonDropforUsers({super.key, required this.onUserSelected});
 
   @override
-  State<UsersDropdown> createState() => _UsersDropdownState();
+  State<CommonDropforUsers> createState() => _CommonDropforUsersState();
 }
 
-class _UsersDropdownState extends State<UsersDropdown> {
+class _CommonDropforUsersState extends State<CommonDropforUsers> {
   Map<String, dynamic>? _selectedUser;
 
   @override
@@ -71,6 +71,40 @@ class _UsersDropdownState extends State<UsersDropdown> {
           },
         );
       },
+    );
+  }
+}
+
+class CommonDropDown extends StatelessWidget {
+  final String value;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
+
+  const CommonDropDown({
+    super.key,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+          border: Border.all(), borderRadius: BorderRadius.circular(5)),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          items: items.map((val) {
+            return DropdownMenuItem<String>(
+              value: val,
+              child: Text(val),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      ),
     );
   }
 }

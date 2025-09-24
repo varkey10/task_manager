@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_manager/api/api_calls/api_calls.dart';
-import 'package:task_manager/cubit/task_cubit_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager/api/api_calls';
+import 'package:task_manager/cubit/authentication/Auth_cubit_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final NetworkRepository _network = NetworkRepository();
   AuthCubit() : super(AuthInitial());
 
-  final TextEditingController emailCtrl = TextEditingController();
-  final TextEditingController passCtrl = TextEditingController();
+  final username = TextEditingController();
+  final emailCtrl = TextEditingController(text: "eve.holt@reqres.in");
+  final passCtrl = TextEditingController(text: "pass@123");
 
   List<Map<String, dynamic>> usersList = [];
 
@@ -23,8 +25,10 @@ class AuthCubit extends Cubit<AuthState> {
           "password": password,
         };
         final response = await _network.userLogin(param);
-        print("response $response");
-        if (response != null) {
+        if (response != null && response["token"] != null) {
+          final token = response["token"];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("token", token);
           emit(AuthLoggedIn(email, password));
           getUsersList();
         } else {
@@ -35,6 +39,23 @@ class AuthCubit extends Cubit<AuthState> {
       print(e);
       emit(AuthError(e.toString()));
     }
+  }
+
+  Future<void> checkSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+    if (token != null) {
+      emit(AuthLoggedIn("persisted_user@test.com", "pass@123"));
+    } else {
+      emit(AuthInitial());
+    }
+  }
+
+  Future<void> logout() async {
+    emit(AuthLoading());
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
+    emit(AuthInitial());
   }
 
   void register(String name, String email, String password) async {
@@ -68,9 +89,5 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       emit(AuthError(e.toString()));
     }
-  }
-
-  void logout() {
-    emit(AuthInitial());
   }
 }
