@@ -9,8 +9,8 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
   final username = TextEditingController();
-  final emailCtrl = TextEditingController(text: "eve.holt@reqres.in");
-  final passCtrl = TextEditingController(text: "pass@123");
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
 
   List<Map<String, dynamic>> usersList = [];
 
